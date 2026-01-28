@@ -1,0 +1,24 @@
+version: "v1"
+name: "CSP Rubric"
+dimensions:
+  - id: "capability_overlap"
+    name: "Capability Overlap"
+    description: "Degree to which safety work transfers to general capability gains."
+    anchors:
+      0: "No overlap with general capabilities."
+      3: "Moderate overlap with indirect capability gains."
+      5: "High overlap or direct capability gains."
+  - id: "diffusion_risk"
+    name: "Diffusion Risk"
+    description: "Likelihood that insights diffuse into broader capability research."
+    anchors:
+      0: "Contained within safety community."
+      3: "Some diffusion to capability work."
+      5: "Rapid or likely diffusion into capability work."
+  - id: "strategic_leverage"
+    name: "Strategic Leverage"
+    description: "Potential to unlock new research pathways or tools."
+    anchors:
+      0: "No leverage beyond immediate task."
+      3: "Moderate leverage for related methods."
+      5: "High leverage across multiple capability areas."

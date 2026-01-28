@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Virtual environments
+.venv/
+venv/
+
+# Testing
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# OS
+.DS_Store
+
+# Env files
+.env
+.env.*
+
+# Data outputs
+/data_raw/
+/data_processed/
+/artifacts/
+
+# Logs
+*.log

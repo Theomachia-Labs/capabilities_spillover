@@ -1,0 +1,14 @@
+{
+  "paper_id": "paper-001",
+  "title": "Example Paper",
+  "abstract": "An example abstract.",
+  "year": 2020,
+  "identifiers": {
+    "doi": "10.1234/example",
+    "openalex": "W123456"
+  },
+  "authors": [
+    {"name": "Ada Lovelace", "author_id": "A123"}
+  ],
+  "citations": ["paper-002", "paper-003"]
+}

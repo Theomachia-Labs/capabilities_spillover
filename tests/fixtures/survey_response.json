@@ -1,0 +1,18 @@
+{
+  "response_id": "resp-001",
+  "respondent_id": "expert-007",
+  "created_at": "2025-01-11T09:00:00Z",
+  "calibration": {
+    "score": 0.8,
+    "notes": "Calibration round 1"
+  },
+  "responses": [
+    {
+      "topic": "RLHF",
+      "dimensions": {
+        "capability_overlap": {"score": 2, "uncertainty": 0.3},
+        "diffusion_risk": {"score": 4, "uncertainty": 0.2}
+      }
+    }
+  ]
+}
