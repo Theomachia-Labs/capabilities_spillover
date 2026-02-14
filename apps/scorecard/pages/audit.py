@@ -89,10 +89,13 @@ def render_audit_queue():
                     st.rerun()
                 
                 # Override with correction
+                normalized_label = label_obj.label.replace("-", "_")
+                if normalized_label not in ["safety_use", "capability_use", "mixed", "unclear"]:
+                    normalized_label = "unclear"
                 corrected = st.selectbox(
                     "Or correct to:",
                     ["safety_use", "capability_use", "mixed", "unclear"],
-                    index=["safety_use", "capability_use", "mixed", "unclear"].index(label_obj.label),
+                    index=["safety_use", "capability_use", "mixed", "unclear"].index(normalized_label),
                     key=f"correct_{label_obj.label_id}"
                 )
                 

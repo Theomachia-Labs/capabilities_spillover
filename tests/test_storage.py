@@ -72,3 +72,19 @@ def test_create_and_get_score(db_session: Session):
     retrieved = crud.get_score(db_session, "score_001")
     assert retrieved is not None
     assert retrieved.dimensions["dim1"]["score"] == 3
+
+
+def test_create_label_normalizes_legacy_hyphen_format(db_session: Session):
+    label_data = {
+        "label_id": "label_001",
+        "paper_id": "test_001",
+        "label": "safety-use",
+        "confidence": 0.8,
+        "method": "rules",
+        "audit_status": "pending",
+        "created_at": "2023-01-01T00:00:00Z",
+        "evidence_spans": [],
+    }
+
+    created = crud.create_label(db_session, label_data)
+    assert created.label == "safety_use"

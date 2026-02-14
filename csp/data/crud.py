@@ -67,12 +67,23 @@ def get_score(db: Session, score_id: str) -> Score | None:
 from csp.data.models import Label
 
 
+_LABEL_NORMALIZATION = {
+    "safety-use": "safety_use",
+    "capability-use": "capability_use",
+}
+
+
+def _normalize_label(label: str) -> str:
+    """Normalize legacy label spellings to schema-compliant values."""
+    return _LABEL_NORMALIZATION.get(label, label)
+
+
 def create_label(db: Session, record: dict[str, Any]) -> Label:
     """Create a new label record."""
     db_obj = Label(
         label_id=record["label_id"],
         paper_id=record["paper_id"],
-        label=record["label"],
+        label=_normalize_label(record["label"]),
         confidence=record.get("confidence", 0.5),
         method=record["method"],
         audit_status=record.get("audit_status", "pending"),
@@ -106,8 +117,7 @@ def update_label_status(db: Session, label_id: str, new_status: str, new_label: 
     if db_obj:
         db_obj.audit_status = new_status
         if new_label:
-            db_obj.label = new_label
+            db_obj.label = _normalize_label(new_label)
         db.commit()
         db.refresh(db_obj)
     return db_obj
-

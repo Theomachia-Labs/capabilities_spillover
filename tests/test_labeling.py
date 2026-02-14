@@ -15,7 +15,7 @@ def test_keyword_labeler_safety():
     labeler = KeywordLabeler()
     result = labeler.label_paper(paper)
     
-    assert result["label"] == "safety-use"
+    assert result["label"] == "safety_use"
     assert result["confidence"] > 0.5
 
 def test_keyword_labeler_capability():
@@ -27,7 +27,7 @@ def test_keyword_labeler_capability():
     labeler = KeywordLabeler()
     result = labeler.label_paper(paper)
     
-    assert result["label"] == "capability-use"
+    assert result["label"] == "capability_use"
 
 def test_llm_labeler_stub():
     paper = Paper(paper_id="p3", title="Unknown", abstract="Unknown")
@@ -37,4 +37,3 @@ def test_llm_labeler_stub():
     assert result["method"] == "llm"
     assert result["label"] in ["safety_use", "capability_use", "mixed", "unclear"]
     assert "audit_status" in result
-

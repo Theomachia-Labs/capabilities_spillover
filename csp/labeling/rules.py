@@ -22,10 +22,10 @@ class KeywordLabeler(Labeler):
         capability_score = sum(1 for k in self.CAPABILITY_KEYWORDS if k in text)
 
         if safety_score > 0 and capability_score == 0:
-            label = "safety-use"
+            label = "safety_use"
             confidence = 0.8
         elif capability_score > 0 and safety_score == 0:
-            label = "capability-use"
+            label = "capability_use"
             confidence = 0.8
         elif safety_score > 0 and capability_score > 0:
             label = "mixed"
