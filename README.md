@@ -1,6 +1,20 @@
 # CSP Toolkit
 
-Capability Spillover Potential (CSP) Toolkit for scoring, labeling, and analyzing research portfolios with a safety-first workflow.
+Capability Spillover Potential (CSP) Toolkit for studying spillover between AI safety/alignment research and AI capabilities research.
+
+## Conceptual Overview
+
+This repository is a research workflow for answering a practical alignment question:
+
+- Which AI safety/alignment topics are most likely to spill over into general capabilities progress?
+- Which capabilities topics may spill back into safety-relevant methods, tools, or governance insight?
+
+In short, it helps evaluate where research is likely to be:
+- net safety-supporting,
+- dual-use with meaningful spillover risk,
+- or primarily capability-accelerating.
+
+The goal is not to make final judgments automatically. The goal is to provide a structured, evidence-backed starting point for analysis: rubric scoring, citation-flow analysis, labeling, expert aggregation, and policy-brief outputs.
 
 ## What Is Implemented
 
