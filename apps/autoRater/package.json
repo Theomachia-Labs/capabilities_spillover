@@ -1,0 +1,8 @@
+{
+  "name": "autorater",
+  "version": "1.0.0",
+  "scripts": {
+    "install:all": "cd server && npm install",
+    "dev": "cd server && npx tsx src/index.ts"
+  }
+}

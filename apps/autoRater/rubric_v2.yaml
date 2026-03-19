@@ -1,0 +1,192 @@
+version: "vDraft"
+name: "CSP Rubric"
+dimensions:
+  - id: "direct_capability_impact"
+    name: "Direct Capability Impact"
+    description: >
+      Does the paper itself demonstrate or report improvements on
+      recognised capability benchmarks (e.g., MMLU, HumanEval, GSM8K,
+      ARC, BigBench, SWE-Bench, HellaSwag, etc.)? This dimension captures whether
+      the paper's own experiments already show capability gains,
+      regardless of whether that was the authors' intent.
+    anchors:
+      0: >
+        No capability benchmarks reported or improved upon. Paper does not evaluate on
+        any general capability benchmarks; all evaluations are
+        safety-specific (e.g., toxicity, refusal rates, alignment scores).
+      1: >
+        Capability benchmarks reported but unchanged. Paper includes
+        capability benchmarks as controls and shows no significant
+        change (within noise / <1% movement).
+      2: >
+        Minor incidental gains. Paper reports small improvements on
+        1-2 capability benchmarks (1-3% relative improvement) as a
+        side-effect, not a primary result. The benefit may be accrued 
+        primarily by non-frontier models.
+      3: >
+        Moderate capability gains. Paper shows consistent improvements
+        across multiple capability benchmarks or a substantial gain (>5%) 
+        on a single benchmark. Either large gains for small models, or small 
+        gains for frontier models. 
+      4: >
+        Significant capability gains. Paper demonstrates substantial
+        improvements for frontier models across multiple recognised
+        benchmarks, even though the paper is framed as safety research.
+      5: >
+        State-of-the-art capability results. Paper achieves new SOTA
+        or near-SOTA on one or more major capability benchmarks;
+        the capability improvement is itself a publishable result
+        regardless of the safety framing.
+
+  - id: "technical_transferability"
+    name: "Technical Transferability"
+    description: >
+      Does the paper produce concrete methods, artifacts, or techniques
+      (architectures, training procedures, datasets, benchmarks, algorithms)
+      that a capability researcher could directly extract and apply to
+      improve model performance on general tasks?
+    anchors:
+      0: >
+        No extractable methods relevant to capabilities. Paper is purely
+        conceptual, governance-focused, or uses only standard off-the-shelf
+        techniques with no novel methodological contribution.
+      1: >
+        Marginal transferability. Paper applies known methods in a
+        safety-specific context; a capability researcher might note it
+        but would gain no usable technique.
+      2: >
+        Indirect transferability. Paper contains insights about model
+        behaviour (e.g., interpretability findings, failure mode analysis)
+        that could inform capability research but require substantial
+        further work to operationalise.
+      3: >
+        Moderate transferability. Paper develops a novel method for safety
+        purposes (e.g., a fine-tuning variant, data filtering pipeline,
+        evaluation framework) that could be adapted for capability gains
+        with non-trivial but feasible engineering effort.
+      4: >
+        High transferability. Paper introduces a technique that is
+        directly applicable to capability work with minor modifications
+        (e.g., a training efficiency improvement framed as alignment,
+        a robustness method that also improves generalisation).
+      5: >
+        Directly transferable. Paper produces a method, architecture,
+        dataset, or tool that a capability researcher could adopt
+        as-is with no modification (e.g., a general-purpose training 
+        algorithm, a large curated dataset).
+
+
+  - id: "audience_exposure"
+    name: "Audience & Venue Exposure"
+    description: >
+      How visible is this work to capability researchers? Considers
+      publication venue, author affiliations and networks, framing
+      and terminology, and observed citation patterns.
+    anchors:
+      0: >
+        Minimal exposure. Published in a safety-specific venue
+        (e.g., Alignment Forum, safety workshop) by authors outside
+        major capability labs, using safety-specific terminology
+        unlikely to surface in capability literature searches.
+      1: >
+        Low exposure. Published in a niche venue or preprint with
+        limited readership; authors have weak ties to capability
+        research communities.
+      2: >
+        Some exposure. Published at a recognised venue (e.g., a
+        main conference workshop or small conference); authors
+        have some connections to capability labs; paper uses some
+        general ML terminology.
+      3: >
+        Moderate exposure. Published at a top-tier ML venue
+        (NeurIPS, ICML, ICLR) in a safety track or as a poster;
+        authors affiliated with labs that also do capability work;
+        paper is framed in partly general terms.
+      4: >
+        High exposure. Published at a top-tier venue; authors are 
+        well-known in both safety and capability communities; 
+        paper is framed in general ML terms accessible to 
+        capability researchers.
+      5: >
+        Maximum exposure. Published at a top-tier venue with wide
+        coverage; authored by researchers at major capability labs; 
+        already being cited by or discussed in capability research;
+        framed in general terms.
+
+  - id: "marginal_contribution"
+    name: "Marginal Contribution"
+    description: >
+      Does this safety work provide knowledge or methods that capability
+      researchers did not already have and were unlikely to develop
+      independently in the near term? Assesses novelty relative to the
+      existing capability research landscape, not novelty within safety.
+    anchors:
+      0: >
+        No marginal contribution. The methods and insights are already
+        well-established in the capability literature (e.g., standard
+        fine-tuning, known architectures, widely-used training tricks).
+        Capability researchers would gain nothing new.
+      1: >
+        Negligible contribution. The techniques are minor variations of
+        known capability methods; capability researchers would likely
+        arrive at equivalent results within weeks through normal work.
+      2: >
+        Small contribution. Paper applies known methods in a somewhat
+        novel combination or context; capability researchers might find
+        it mildly informative but are pursuing similar directions
+        independently.
+      3: >
+        Moderate contribution. Paper develops a genuinely novel method
+        that capability researchers have not yet published on, but which
+        lies in a direction they are plausibly heading. Likely accelerates
+        their timeline by several months.
+      4: >
+        Significant contribution. Paper explores a research direction
+        that is not on the public roadmap of major capability labs;
+        the safety motivation led to an approach that capability
+        researchers were unlikely to pursue in the near term (up to a year).
+      5: >
+        Major contribution. Paper opens a fundamentally new direction
+        that capability researchers were not pursuing. The safety 
+        framing was essential to arriving at this insight or method.
+
+  - id: "strategic_leverage"
+    name: "Strategic Leverage"
+    description: >
+      Does this paper open specific, identifiable new research directions
+      that could lead to capability advances? Assesses whether the paper
+      provides tools, frameworks, theoretical insights, or empirical
+      findings that would enable concrete new lines of capability
+      research that did not previously exist.
+    anchors:
+      0: >
+        No enablement. Paper does not provide any foundation for new
+        capability research directions. Results and methods are
+        self-contained within safety applications.
+      1: >
+        Minimal enablement. Paper's methods or findings could
+        theoretically inspire capability research, but no specific
+        new research direction is identifiable.
+      2: >
+        Indirect enablement. Paper provides a tool, dataset, or
+        theoretical result that could serve as a building block for
+        capability research if combined with other advances
+        (e.g., an interpretability tool that could inform architecture
+        search if significantly extended).
+      3: >
+        Moderate enablement. Paper enables one identifiable new
+        capability research direction (e.g., a new evaluation framework
+        that reveals an unexploited model capacity, or a training
+        signal that could be repurposed for pre-training).
+      4: >
+        Significant enablement. Paper enables multiple identifiable
+        capability research directions or provides a general-purpose
+        tool/framework that substantially lowers the barrier to
+        entry for a class of capability experiments.
+      5: >
+        High enablement. Paper establishes a new paradigm, benchmark
+        suite, or foundational method that is likely to spawn an
+        entire sub-field of capability research (e.g., a new way
+        of eliciting latent model capabilities that generalises
+        broadly, or a training methodology with clear applications
+        across capability domains).

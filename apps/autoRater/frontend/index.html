@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>autoRater - AI Safety Paper Rating</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div id="cost-bar">
+    Cumulative Cost: $<span id="cost-total">0.000000</span>
+  </div>
+
+  <div id="app">
+    <h1>autoRater</h1>
+    <p class="subtitle">AI Safety Paper Capability Spillover Rating</p>
+
+    <details id="api-keys-section">
+      <summary>API Keys (stored in browser)</summary>
+      <div class="key-fields">
+        <label>OpenRouter API Key
+          <input type="password" id="openrouter-key" placeholder="sk-or-..." />
+        </label>
+        <label>Gemini API Key
+          <input type="password" id="gemini-key" placeholder="AI..." />
+        </label>
+        <button id="save-keys">Save Keys</button>
+        <button id="list-gemini-models">List Gemini Models</button>
+      </div>
+      <div id="gemini-models-list" class="hidden"></div>
+    </details>
+
+    <div id="mode-tabs">
+      <button class="mode-tab active" data-mode="single">Single Paper</button>
+      <button class="mode-tab" data-mode="reliability">Reliability Mode</button>
+      <button class="mode-tab" data-mode="reliability-history">Reliability Comparisons</button>
+      <button class="mode-tab" data-mode="calibration">Calibration Analysis</button>
+    </div>
+
+    <div id="main-panel">
+      <div id="single-mode-ui">
+        <div class="input-section">
+          <label for="arxiv-url">Arxiv URL</label>
+          <input type="text" id="arxiv-url" placeholder="https://arxiv.org/abs/2301.07067" />
+        </div>
+      </div>
+
+      <div id="reliability-mode-ui" class="hidden">
+        <div class="input-section">
+          <label for="arxiv-urls">Arxiv URLs (one per line)</label>
+          <textarea id="arxiv-urls" rows="5" placeholder="https://arxiv.org/abs/2301.07067&#10;https://arxiv.org/abs/2206.05802"></textarea>
+        </div>
+        <div class="input-section">
+          <label for="attempt-count">Attempts per (Paper, Model, Uncertainty Type)</label>
+          <input type="number" id="attempt-count" value="3" min="1" max="10" />
+        </div>
+      </div>
+
+      <div id="reliability-history-ui" class="hidden">
+        <div class="input-section">
+          <label for="rel-history-select">Select Past Reliability Test</label>
+          <select id="rel-history-select">
+            <option value="">Loading...</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="calibration-mode-ui" class="hidden">
+        <div class="input-section">
+          <label>Select Reliability Runs to Analyze</label>
+          <div id="calibration-run-picker" class="run-picker">
+            <label class="run-picker-item">
+              <input type="checkbox" id="cal-select-all" /> <strong>Select All</strong>
+            </label>
+            <div id="cal-run-list"></div>
+          </div>
+        </div>
+        <div class="input-section">
+          <label for="cal-paper-filter">Filter by Paper (optional)</label>
+          <select id="cal-paper-filter">
+            <option value="">All Papers</option>
+          </select>
+        </div>
+
+        <details class="cal-explainer">
+          <summary>What is this calculating?</summary>
+          <div class="cal-explainer-body">
+            <p><strong>Goal:</strong> Determine which of the 4 uncertainty question formats produces the most informative uncertainty values &mdash; i.e., which type's stated uncertainty best predicts how much a model's scores actually vary.</p>
+            <p><strong>How it works:</strong></p>
+            <ol>
+              <li><strong>Normalize uncertainties</strong> &mdash; All 4 types are converted to a 0&ndash;1 scale. Types 1 &amp; 2 are already 0&ndash;1. Type 3 (range [low, high]) becomes <code>(high &minus; low) / 5</code>. Type 4 (evidence string) is mapped to fixed values ("Strong direct" &rarr; 0.1, "Some indirect" &rarr; 0.4, etc.).</li>
+              <li><strong>Compute actual score variance</strong> &mdash; For each (model, paper, dimension), we measure how much the model's scores vary across repeated attempts. "Combined" uses all 12 scores (3 attempts &times; 4 types); "Per-type" uses only the 3 scores within each type.</li>
+              <li><strong>Correlate</strong> &mdash; For each uncertainty type, we compute the Pearson correlation between <em>stated uncertainty</em> (X) and <em>actual score variance</em> (Y) across all data points. A positive correlation means the model "knows when it doesn't know" &mdash; high stated uncertainty corresponds to inconsistent scores.</li>
+            </ol>
+            <p><strong>Interpreting results:</strong> The type with the highest positive Pearson r is best-calibrated. r &asymp; 0 means the uncertainty is noise. r &lt; 0 means the model is overconfident precisely when it should be uncertain.</p>
+          </div>
+        </details>
+
+        <details class="cal-explainer">
+          <summary>Uncertainty Type Definitions</summary>
+          <div class="cal-explainer-body">
+            <ul class="cal-definitions-list">
+              <li><strong>Type 1: Uncertainty (0-1)</strong> &mdash; A 0-1 rating where 0 means complete certainty and 1 means a complete guess.</li>
+              <li><strong>Type 2: Probability off by 2+</strong> &mdash; The probability that the "true score" could be 2 or more points away from the guess.</li>
+              <li><strong>Type 3: Plausible range</strong> &mdash; The lowest and highest scores that are considered plausible (e.g., [2, 4]). Larger ranges indicate higher uncertainty.</li>
+              <li><strong>Type 4: Evidence level</strong> &mdash; How much evidence the score was based on: <em>Strong direct evidence</em>, <em>Some indirect evidence</em>, <em>Very little evidence</em>, or <em>Pure guess</em>.</li>
+            </ul>
+          </div>
+        </details>
+
+        <button id="cal-analyze-btn" class="primary-btn">Analyze Calibration</button>
+        <div id="cal-results" class="hidden" style="margin-top: 20px;">
+          <div id="cal-controls" style="display: flex; gap: 16px; align-items: center; margin-bottom: 16px; flex-wrap: wrap;">
+            <label style="color: #ccc; font-size: 14px; display: flex; align-items: center; gap: 6px;">
+              Variance:
+              <select id="cal-variance-toggle" style="padding: 4px 8px; background: #0f1117; border: 1px solid #2a2d3a; border-radius: 4px; color: #e0e0e0;">
+                <option value="combined">Combined (all 12 scores)</option>
+                <option value="pertype">Per-Type (3 scores only)</option>
+                <option value="between">Between-Model</option>
+              </select>
+            </label>
+            <label style="color: #ccc; font-size: 14px; display: flex; align-items: center; gap: 6px;">
+              Color by:
+              <select id="cal-color-by" style="padding: 4px 8px; background: #0f1117; border: 1px solid #2a2d3a; border-radius: 4px; color: #e0e0e0;">
+                <option value="model">Model</option>
+                <option value="dimension">Dimension</option>
+                <option value="paper">Paper</option>
+              </select>
+            </label>
+            <label style="color: #ccc; font-size: 14px; display: flex; align-items: center; gap: 6px;">
+              Model:
+              <select id="cal-model-filter" style="padding: 4px 8px; background: #0f1117; border: 1px solid #2a2d3a; border-radius: 4px; color: #e0e0e0;">
+                <option value="">All Models (pooled)</option>
+                <option value="__per_model__">All Models (per-model overlay)</option>
+              </select>
+            </label>
+          </div>
+          <div id="cal-charts" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+            <div class="cal-chart-box"><canvas id="cal-chart-scatter"></canvas></div>
+            <div class="cal-chart-box"><canvas id="cal-chart-bars"></canvas></div>
+            <div class="cal-chart-box"><canvas id="cal-chart-binned"></canvas></div>
+            <div class="cal-chart-box" id="cal-heatmap-container"></div>
+            <div class="cal-chart-box" id="cal-icc-container"></div>
+            <div class="cal-chart-box" id="cal-ranking-container"></div>
+          </div>
+          <div id="cal-summary"></div>
+        </div>
+      </div>
+
+      <div class="sections-selection" id="sections-selection">
+        <h3>Include Sections</h3>
+        <div id="section-checkboxes">
+          <label class="section-checkbox"><input type="checkbox" value="abstract" checked /> Abstract</label>
+          <label class="section-checkbox"><input type="checkbox" value="introduction" checked /> Introduction</label>
+          <label class="section-checkbox"><input type="checkbox" value="relatedWork" /> Related Work</label>
+          <label class="section-checkbox"><input type="checkbox" value="methods" /> Methods</label>
+          <label class="section-checkbox"><input type="checkbox" value="results" checked /> Results</label>
+          <label class="section-checkbox"><input type="checkbox" value="conclusions" /> Conclusions</label>
+          <label class="section-checkbox"><input type="checkbox" value="appendices" /> Appendices</label>
+          <label class="section-checkbox"><input type="checkbox" value="uncategorised" /> Uncategorised</label>
+        </div>
+        <div class="section-limit-row">
+          <label for="max-section-chars">Max chars per section</label>
+          <input type="number" id="max-section-chars" value="8000" min="500" max="100000" step="500" />
+        </div>
+      </div>
+
+      <div class="models-section">
+        <h3>Select Models</h3>
+        <div id="model-checkboxes"></div>
+      </div>
+
+      <button id="rate-btn" class="primary-btn">Rate Paper</button>
+      <button id="run-reliability-btn" class="primary-btn hidden">Run Reliability Test</button>
+    </div>
+
+    <div id="progress-panel" class="hidden">
+      <h3>Progress</h3>
+      <div id="progress-bars"></div>
+      <div id="status-log"></div>
+    </div>
+
+    <div id="results-panel" class="hidden">
+      <h3>Results</h3>
+      <div id="results-content"></div>
+    </div>
+
+    <div id="history-panel">
+      <h3>History</h3>
+      <div id="history-list"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
