@@ -104,11 +104,6 @@ def render_audit_queue():
                         audit.reject_label(db, label_obj.label_id, corrected)
                     st.success(f"Corrected to: {corrected}")
                     st.rerun()
-                if st.button("✏️ Apply Correction", key=f"reject_{label_obj.label_id}"):
-                    with get_db() as db:
-                        audit.reject_label(db, label_obj.label_id, corrected)
-                    st.success(f"Corrected to: {corrected}")
-                    st.rerun()
 
 
 def render_reliability_metrics():
